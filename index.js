@@ -1,4 +1,14 @@
-function repd(){
+
+async function main(){
+  const express = require('express');
+  const bodyParser = require('body-parser')
+  const app = express();
+  // parse application/x-www-form-urlencoded
+  app.use(bodyParser.urlencoded({ extended: false }))
+
+  // parse application/json
+  app.use(bodyParser.json())
+  function repd(){
   var today = new Date();
 let dd = String(today.getDate()).padStart(2, '0');
 let mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
@@ -189,16 +199,6 @@ async function set(data) {
   });
   return response.data;
 }
-async function main(){
-  const express = require('express');
-  const bodyParser = require('body-parser')
-  const app = express();
-  // parse application/x-www-form-urlencoded
-  app.use(bodyParser.urlencoded({ extended: false }))
-
-  // parse application/json
-  app.use(bodyParser.json())
-
 
   //test
   let content = await get();
