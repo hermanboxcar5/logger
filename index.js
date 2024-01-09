@@ -240,7 +240,7 @@ async function main(){
       let data = await get();
       let record = data.record;
       let givenadmin=req.body.admin;
-      if(hash(givenadmin)!==process.env['hashed-admin']){
+      if(hash(givenadmin)!==process.env['hashedadmin']){
         res.send(`${signinpage}
           <script>window.alert('Invalid Admin Password. Please contact admins if you do not know the password')</script>
         `);
