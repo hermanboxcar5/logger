@@ -1,14 +1,4 @@
-
-async function main(){
-  const express = require('express');
-  const bodyParser = require('body-parser')
-  const app = express();
-  // parse application/x-www-form-urlencoded
-  app.use(bodyParser.urlencoded({ extended: false }))
-
-  // parse application/json
-  app.use(bodyParser.json())
-  function repd(){
+function repd(){
   var today = new Date();
 let dd = String(today.getDate()).padStart(2, '0');
 let mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
@@ -105,6 +95,10 @@ pages.home=`
       <br>
       <button type="submit">Go →</button>
     </form>
+      If you are just a guest and came here by mistake, note that this page is for our team only, so please do not try to sign up and guess the admin password, just go back to our <a href='https://richcode.org'>Home website→</a>
+      <br>
+      <br>
+      For our team: If this is your first time here, please sign up with the admin password (ask us if you don't have it), and your prefered email/password. (We hash passwords immidiately after signing up and only store the hashed password so the system doesn't even know your password)
     </div>
   </div>
 </div>
@@ -199,6 +193,16 @@ async function set(data) {
   });
   return response.data;
 }
+async function main(){
+  const express = require('express');
+  const bodyParser = require('body-parser')
+  const app = express();
+  // parse application/x-www-form-urlencoded
+  app.use(bodyParser.urlencoded({ extended: false }))
+
+  // parse application/json
+  app.use(bodyParser.json())
+
 
   //test
   let content = await get();
@@ -240,7 +244,7 @@ async function set(data) {
       let data = await get();
       let record = data.record;
       let givenadmin=req.body.admin;
-      if(hash(givenadmin)!==process.env['hashedadmin']){
+      if(hash(givenadmin)!==process.env['hashed-admin']){
         res.send(`${signinpage}
           <script>window.alert('Invalid Admin Password. Please contact admins if you do not know the password')</script>
         `);
@@ -291,9 +295,15 @@ async function set(data) {
       data = data.record;
       let name = data.users[email].name;
       
-      
+      if(!data.users[email].data.total){
+        data.users[email].data.total={
+          h:0,
+          m:0,
+          s:0
+        }
+      }
       res.send(`
-      <style>
+     <style>
        @import url('https://fonts.googleapis.com/css2?family=Comfortaa&family=Inter:wght@300&family=Work+Sans:wght@400;500&display=swap');
         body, div, h1, input, button {
 
@@ -356,9 +366,31 @@ async function set(data) {
             <button type="button" onclick='resettimer()'>Reset Timer</button><br>
             <button type='submit'>End Timer and Log Time</button>
             </form>
-          </form>
-        </div>
+          <div id='total'>
+            <h1>Your total time:</h1>
+            <b>${data.users[email].data.total.h}</b>h <b>${data.users[email].data.total.m}</b>m <b>${data.users[email].data.total.s}</b>s
+          </div>
+        </div>  
       </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+        
       <script>
         function calcdiff(previousDate) {
           // Get the current date and time
@@ -510,9 +542,18 @@ async function set(data) {
     // }
     data[email].data.total.h+=parseInt(req.body.h)
     if(parseInt(req.body.m)+data[email].data.total.m>=60){
-      data[email].data.total.h++
+      data[email].data.total.h+=1
       data[email].data.total.m=(parseInt(req.body.m)+data[email].data.total.m)%60
+    } else {
+      data[email].data.total.m=(parseInt(req.body.m)+data[email].data.total.m)
     }
+    if(parseInt(req.body.s)+data[email].data.total.s>=60){
+      data[email].data.total.m+=1
+      data[email].data.total.s=(parseInt(req.body.s)+data[email].data.total.s)%60
+    } else {
+      data[email].data.total.s=(parseInt(req.body.s)+data[email].data.total.s)
+    }
+    
     if(!data[email].logs){
     data[email].logs={}  
     }
